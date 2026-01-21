@@ -8,36 +8,39 @@ import com.frida.ui_testing.domain.repo.RepoRepository
 class FakeRepoRepository : RepoRepository {
 
     var shouldReturnError = false
+    var items = listOf(
+        Item(
+            id = 1L,
+            name = "repo",
+            fullName = "user/repo",
+            htmlUrl = "https://github.com/user/repo",
+            owner = Owner(
+                login = "user",
+                id = 1L,
+                avatarUrl = "https://example.com/avatar.png",
+                nodeId = "MDQ6VXNlcjE=",
+                gravatarId = "https://example.com/avatar.png",
+                url = "https://example.com/avatar.png",
+                htmlUrl = "https://example.com/avatar.png",
+                followersUrl = "https://example.com/avatar.png"
+            ),
+            nodeId = "MDQ6VXNlcjE=",
+            private = false
+        )
+    )
+    
+    var searchCount = 0
 
     override suspend fun searchRepositories(query: String): Repo {
+        searchCount++
         if (shouldReturnError) {
             throw RuntimeException("Network error")
         }
 
         return Repo(
-            totalCount = 1,
+            totalCount = items.size.toLong(),
             incompleteResults = false,
-            items = listOf(
-                Item(
-                    id = 1L,
-                    name = "repo",
-                    fullName = "user/repo",
-                    htmlUrl = "https://github.com/user/repo",
-                    owner = Owner(
-                        login = "user",
-                        id = 1L,
-                        avatarUrl = "https://example.com/avatar.png",
-                        nodeId = "MDQ6VXNlcjE=",
-                        gravatarId = "https://example.com/avatar.png",
-                        url = "https://example.com/avatar.png",
-                        htmlUrl = "https://example.com/avatar.png",
-                        followersUrl = "https://example.com/avatar.png"
-                    ),
-                    nodeId = "MDQ6VXNlcjE=",
-                    private = false
-
-                )
-            )
+            items = items
         )
     }
 }

@@ -14,6 +14,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,9 +29,15 @@ class RepoScreenComposeTest {
     @get:Rule(order = 1)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
+    private lateinit var repoRepository: FakeRepoRepository
+
     @Before
     fun setup() {
         hiltRule.inject()
+        repoRepository = EntryPointAccessors.fromApplication(
+            composeRule.activity.applicationContext,
+            RepoTestEntryPoint::class.java
+        ).repoRepository() as FakeRepoRepository
     }
 
     @Test
@@ -55,12 +62,7 @@ class RepoScreenComposeTest {
 
     @Test
     fun error_showsSnackbar() {
-        val repo = EntryPointAccessors.fromApplication(
-            composeRule.activity.applicationContext,
-            RepoTestEntryPoint::class.java
-        ).repoRepository() as FakeRepoRepository
-
-        repo.shouldReturnError = true
+        repoRepository.shouldReturnError = true
 
         composeRule
             .onNodeWithTag("search_input")
@@ -75,4 +77,55 @@ class RepoScreenComposeTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun search_emptyResults_showsEmptyState() {
+        repoRepository.items = emptyList()
+
+        composeRule
+            .onNodeWithTag("search_input")
+            .performTextInput("nonexistent")
+
+        composeRule
+            .onNodeWithTag("search_button")
+            .performClick()
+
+        composeRule
+            .onNodeWithTag("empty_state")
+            .assertIsDisplayed()
+
+        composeRule
+            .onNodeWithText("No data")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun search_emptyQuery_doesNotTriggerSearch() {
+        val initialSearchCount = repoRepository.searchCount
+
+        composeRule
+            .onNodeWithTag("search_button")
+            .performClick()
+
+        assertEquals(initialSearchCount, repoRepository.searchCount)
+    }
+
+    @Test
+    fun repoListItem_displaysDetails() {
+        composeRule
+            .onNodeWithTag("search_input")
+            .performTextInput("repo")
+
+        composeRule
+            .onNodeWithTag("search_button")
+            .performClick()
+
+        // Verify owner name and URL are displayed
+        composeRule
+            .onNodeWithText("user")
+            .assertIsDisplayed()
+
+        composeRule
+            .onNodeWithText("https://github.com/user/repo")
+            .assertIsDisplayed()
+    }
 }
