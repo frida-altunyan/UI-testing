@@ -28,6 +28,9 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
     }
 
     buildTypes {
@@ -104,5 +107,8 @@ dependencies {
 
     testImplementation(libs.hilt.android.testing)
     kspTest(libs.hilt.compiler)
+
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.turbine)
 
 }

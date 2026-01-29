@@ -119,7 +119,6 @@ class RepoScreenComposeTest {
             .onNodeWithTag("search_button")
             .performClick()
 
-        // Verify owner name and URL are displayed
         composeRule
             .onNodeWithText("user")
             .assertIsDisplayed()
