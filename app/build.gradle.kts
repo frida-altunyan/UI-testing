@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.androidTestImplementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -91,6 +92,7 @@ dependencies {
 
     // Tests
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -103,12 +105,14 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.truth)
     kspAndroidTest(libs.hilt.compiler)
 
     testImplementation(libs.hilt.android.testing)
     kspTest(libs.hilt.compiler)
 
-    testImplementation(libs.junit.jupiter)
     testImplementation(libs.turbine)
+
+    androidTestImplementation(libs.androidx.core.testing)
 
 }
